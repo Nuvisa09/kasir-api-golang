@@ -21,76 +21,41 @@ var produk = []Produk{
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
 
-	// HEALTH CHECK
-	if r.URL.Path == "/health" {
-		w.Header().Set("Content-Type", "application/json")
+	// health check
+	if path == "/health" {
 		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "OK",
-			"message": "API Running",
+			"status": "OK",
 		})
 		return
 	}
 
-	// GET & POST /api/produk
-	if r.URL.Path == "/api/produk" {
+	// /api/produk
+	if path == "/api/produk" {
 		if r.Method == "GET" {
 			json.NewEncoder(w).Encode(produk)
-			return
-		}
-
-		if r.Method == "POST" {
-			var produkBaru Produk
-			json.NewDecoder(r.Body).Decode(&produkBaru)
-			produkBaru.ID = len(produk) + 1
-			produk = append(produk, produkBaru)
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(produkBaru)
 			return
 		}
 	}
 
 	// /api/produk/{id}
-	if strings.HasPrefix(r.URL.Path, "/api/produk/") {
-		idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
+	if strings.HasPrefix(path, "/api/produk/") {
+		idStr := strings.TrimPrefix(path, "/api/produk/")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return
 		}
 
-		switch r.Method {
-		case "GET":
-			for _, p := range produk {
-				if p.ID == id {
-					json.NewEncoder(w).Encode(p)
-					return
-				}
-			}
-
-		case "PUT":
-			var update Produk
-			json.NewDecoder(r.Body).Decode(&update)
-			for i := range produk {
-				if produk[i].ID == id {
-					update.ID = id
-					produk[i] = update
-					json.NewEncoder(w).Encode(update)
-					return
-				}
-			}
-
-		case "DELETE":
-			for i, p := range produk {
-				if p.ID == id {
-					produk = append(produk[:i], produk[i+1:]...)
-					json.NewEncoder(w).Encode(map[string]string{
-						"message": "sukses delete",
-					})
-					return
-				}
+		for _, p := range produk {
+			if p.ID == id {
+				json.NewEncoder(w).Encode(p)
+				return
 			}
 		}
+		http.Error(w, "Produk tidak ditemukan", http.StatusNotFound)
+		return
 	}
 
 	http.NotFound(w, r)
