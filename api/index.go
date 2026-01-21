@@ -21,36 +21,39 @@ var produk = []Produk{
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	path := r.URL.Path
 
-	// ROOT -> /api
-	if path == "/" {
-		w.Header().Set("Content-Type", "application/json")
+	// /api
+	if path == "/" && r.Method == "GET" {
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "API Kasir berjalan",
 		})
 		return
 	}
 
-	// /health -> /api/health
-	if path == "/health" {
-		w.Header().Set("Content-Type", "application/json")
+	// /api/health
+	if path == "/health" && r.Method == "GET" {
 		json.NewEncoder(w).Encode(map[string]string{
 			"status": "OK",
 		})
 		return
 	}
 
-	// /produk -> /api/produk
+	// /api/produk
 	if path == "/produk" && r.Method == "GET" {
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(produk)
 		return
 	}
 
-	// /produk/{id} -> /api/produk/{id}
-	if strings.HasPrefix(path, "/produk/") {
+	// /api/produk/{id}
+	if strings.HasPrefix(path, "/produk/") && r.Method == "GET" {
 		idStr := strings.TrimPrefix(path, "/produk/")
+		if idStr == "" {
+			http.Error(w, "ID wajib diisi", http.StatusBadRequest)
+			return
+		}
+
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -59,7 +62,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 		for _, p := range produk {
 			if p.ID == id {
-				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(p)
 				return
 			}
@@ -71,4 +73,3 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	http.NotFound(w, r)
 }
-
