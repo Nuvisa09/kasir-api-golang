@@ -23,7 +23,16 @@ var produk = []Produk{
 func Handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// /health  -> akses: /api/health
+	// ROOT -> /api
+	if path == "/" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "API Kasir berjalan",
+		})
+		return
+	}
+
+	// /health -> /api/health
 	if path == "/health" {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
@@ -32,16 +41,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// /produk -> akses: /api/produk
-	if path == "/produk" {
-		if r.Method == "GET" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(produk)
-			return
-		}
+	// /produk -> /api/produk
+	if path == "/produk" && r.Method == "GET" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(produk)
+		return
 	}
 
-	// /produk/{id} -> akses: /api/produk/{id}
+	// /produk/{id} -> /api/produk/{id}
 	if strings.HasPrefix(path, "/produk/") {
 		idStr := strings.TrimPrefix(path, "/produk/")
 		id, err := strconv.Atoi(idStr)
@@ -64,3 +71,4 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	http.NotFound(w, r)
 }
+
