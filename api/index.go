@@ -23,25 +23,27 @@ var produk = []Produk{
 func Handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// health check
+	// /health  -> akses: /api/health
 	if path == "/health" {
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
 			"status": "OK",
 		})
 		return
 	}
 
-	// /api/produk
-	if path == "/api/produk" {
+	// /produk -> akses: /api/produk
+	if path == "/produk" {
 		if r.Method == "GET" {
+			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(produk)
 			return
 		}
 	}
 
-	// /api/produk/{id}
-	if strings.HasPrefix(path, "/api/produk/") {
-		idStr := strings.TrimPrefix(path, "/api/produk/")
+	// /produk/{id} -> akses: /api/produk/{id}
+	if strings.HasPrefix(path, "/produk/") {
+		idStr := strings.TrimPrefix(path, "/produk/")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -50,10 +52,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 		for _, p := range produk {
 			if p.ID == id {
+				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(p)
 				return
 			}
 		}
+
 		http.Error(w, "Produk tidak ditemukan", http.StatusNotFound)
 		return
 	}
