@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -343,6 +344,13 @@ func main() {
 	})
 	fmt.Println("GServer running di localhost:8080")
 
+	// err := http.ListenAndServe(":8080", nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Println("Gserver running di port", port)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println("Gagal running server")
