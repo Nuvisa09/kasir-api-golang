@@ -359,7 +359,7 @@ func main() {
 
 	http.HandleFunc("/", welcomeHandler)
 	fmt.Println("Gserver running di port", port)
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":" + port, nil)
 	if err != nil {
 		fmt.Println("Gagal running server")
 	}
