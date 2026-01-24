@@ -11,18 +11,18 @@ import (
 
 // Produk
 type Produk struct {
-	ID    int    `json:"id"`
-	Nama  string `json:"nama"`
-	Harga int    `json:"harga"`
-	Stok  int    `json:"stok"`
-	Category int `json:"category_id"`
+	ID       int    `json:"id"`
+	Nama     string `json:"nama"`
+	Harga    int    `json:"harga"`
+	Stok     int    `json:"stok"`
+	Category int    `json:"category_id"`
 }
 
 type ProdukResponse struct {
-	ID    int    `json:"id"`
-	Nama  string `json:"nama"`
-	Harga int    `json:"harga"`
-	Stok  int    `json:"stok"`
+	ID       int    `json:"id"`
+	Nama     string `json:"nama"`
+	Harga    int    `json:"harga"`
+	Stok     int    `json:"stok"`
 	Category string `json:"category"`
 }
 
@@ -65,7 +65,7 @@ func categoryExists(id int) bool {
 	return false
 }
 
-func getCategoryByIDLocal(id int) (Category, bool){
+func getCategoryByIDLocal(id int) (Category, bool) {
 	for _, c := range categories {
 		if c.ID == id {
 			return c, true
@@ -132,7 +132,6 @@ func createCategory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newCategory)
 }
 
-
 // PUT localhost:8080/api/produk/{id}
 func updateProduk(w http.ResponseWriter, r *http.Request) {
 	// GET id dari request
@@ -153,15 +152,14 @@ func updateProduk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validasi
-			if !categoryExists(updateProduk.Category){
-				http.Error(w, "Category tidak ditemukan", http.StatusBadRequest)
-				return
-			}
-
+	if !categoryExists(updateProduk.Category) {
+		http.Error(w, "Category tidak ditemukan", http.StatusBadRequest)
+		return
+	}
 
 	// loop produk, cari id, ganti sesuai request
 	for i := range produk {
-		if produk [i].ID == id {
+		if produk[i].ID == id {
 			updateProduk.ID = id
 			produk[i] = updateProduk
 
@@ -171,7 +169,6 @@ func updateProduk(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	
 	http.Error(w, "Produk belum ada", http.StatusNotFound)
 }
 
@@ -186,13 +183,13 @@ func updateCategory(w http.ResponseWriter, r *http.Request) {
 
 	var input Category
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-				http.Error(w, "Data tidak valid", http.StatusBadRequest)
-				return
-			}
+		http.Error(w, "Data tidak valid", http.StatusBadRequest)
+		return
+	}
 
 	for i, c := range categories {
 		if c.ID == id {
-			
+
 			categories[i].Name = input.Name
 			categories[i].Description = input.Description
 
@@ -219,17 +216,17 @@ func deleteProduk(w http.ResponseWriter, r *http.Request) {
 		if p.ID == id {
 			// bikin slice baru dengan data sebelum dan sesudah index
 			produk = append(produk[:i], produk[i+1:]...)
-			
+
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]string{
 				"message": "sukses delete",
-		})
+			})
 			return
 		}
 	}
 
 	http.Error(w, "Produk belum ada", http.StatusNotFound)
-	
+
 }
 
 // Delete Kategori
@@ -254,6 +251,13 @@ func deleteCategory(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Kategorii tidak ditemukan", http.StatusNotFound)
 }
 
+func welcomeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Haloo! Selamat datang di API Vita",
+	})
+}
+
 func main() {
 
 	// GET localhost:8080/api/produk/{id}
@@ -265,7 +269,7 @@ func main() {
 		} else if r.Method == "PUT" {
 			updateProduk(w, r)
 		} else if r.Method == "DELETE" {
-			deleteProduk (w, r)
+			deleteProduk(w, r)
 		}
 
 	})
@@ -282,10 +286,10 @@ func main() {
 				cat, _ := getCategoryByIDLocal(p.Category)
 
 				item := ProdukResponse{
-					ID: p.ID,
-					Nama: p.Nama,
-					Harga: p.Harga,
-					Stok: p.Stok,
+					ID:       p.ID,
+					Nama:     p.Nama,
+					Harga:    p.Harga,
+					Stok:     p.Stok,
 					Category: cat.Name,
 				}
 
@@ -302,7 +306,7 @@ func main() {
 				return
 			}
 			// validasi
-			if !categoryExists(produkBaru.Category){
+			if !categoryExists(produkBaru.Category) {
 				http.Error(w, "Category tidak ditemukan", http.StatusBadRequest)
 				return
 			}
@@ -319,7 +323,7 @@ func main() {
 	})
 
 	// Kategori
-	http.HandleFunc("/categories", func (w http.ResponseWriter, r *http.Request)  {
+	http.HandleFunc("/categories", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			getCategories(w, r)
 		} else if r.Method == "POST" {
@@ -328,11 +332,11 @@ func main() {
 	})
 
 	http.HandleFunc("/categories/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET"{
+		if r.Method == "GET" {
 			getCategoryByID(w, r)
-		}else if r.Method == "PUT"{
+		} else if r.Method == "PUT" {
 			updateCategory(w, r)
-		}else if r.Method == "DELETE"{
+		} else if r.Method == "DELETE" {
 			deleteCategory(w, r)
 		}
 	})
@@ -353,6 +357,7 @@ func main() {
 		port = "8080"
 	}
 
+	http.HandleFunc("/", welcomeHandler)
 	fmt.Println("Gserver running di port", port)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
