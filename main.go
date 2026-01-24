@@ -254,7 +254,7 @@ func deleteCategory(w http.ResponseWriter, r *http.Request) {
 func welcomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		fmt.Fprintln(w, "Haloo! Selamat datang di API Vita")
+		"message": "Haloo! Selamat datang di API Vita",
 	})
 }
 
