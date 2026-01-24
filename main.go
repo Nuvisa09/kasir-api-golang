@@ -86,7 +86,16 @@ func getProdukByID(w http.ResponseWriter, r *http.Request) {
 	for _, p := range produk {
 		if p.ID == id {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(p)
+
+			cat, _ := getCategoryByIDLocal(p.Category)
+			response := ProdukResponse{
+				ID:       p.ID,
+				Nama:     p.Nama,
+				Harga:    p.Harga,
+				Stok:     p.Stok,
+				Category: cat.Name,
+			}
+			json.NewEncoder(w).Encode(response)
 			return
 		}
 	}
@@ -359,7 +368,7 @@ func main() {
 
 	http.HandleFunc("/", welcomeHandler)
 	fmt.Println("Gserver running di port", port)
-	err := http.ListenAndServe(":" + port, nil)
+	err := http.ListenAndServe(":8080" , nil)
 	if err != nil {
 		fmt.Println("Gagal running server")
 	}
