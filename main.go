@@ -28,8 +28,8 @@ type ProdukResponse struct {
 
 var produk = []Produk{
 	{ID: 1, Nama: "Indomie Godog", Harga: 3500, Stok: 10},
-	{ID: 2, Nama: "Vit 1000ml", Harga: 3000, Stok: 40},
-	{ID: 3, Nama: "Kecap", Harga: 12000, Stok: 28},
+	{ID: 2, Nama: "Vit 1000ml", Harga: 3000, Stok: 40, Category: 2},
+	{ID: 3, Nama: "Kecap", Harga: 12000, Stok: 28, Category: 3},
 }
 
 // Kategori
@@ -41,8 +41,11 @@ type Category struct {
 }
 
 var categories = []Category{
+	{ID: 1, Name: "Makanan", Description: "Produk makanan siap saji"},
+	{ID: 2, Name: "Minuman", Description: "Minuman botol dan kemasan"},
+	{ID: 3, Name: "Bumbu", Description: "Bumbu dapur dan saus"},
 }
-var nextCategoryID = 1
+var nextCategoryID = 4
 
 // get Kategori keseluruhan
 
